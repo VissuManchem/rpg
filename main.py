@@ -3,6 +3,7 @@ import tcod
 
 from engine import Engine
 from entity import Entity
+from game_map import GameMap
 from input_handlers import EventHandler
 
 
@@ -10,6 +11,10 @@ def main() -> None:
     # Variables to determine screen size
     screen_width = 80
     screen_height = 50
+
+    # Dimensions of the map
+    map_width = 80
+    map_height = 45
 
     # Tell TCOD what font to use. In this case, it would be the dejavu PNG
     tileset = tcod.tileset.load_tilesheet(
@@ -24,8 +29,10 @@ def main() -> None:
     npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), "@", (255, 255, 0))
     # All entities on map stores in this set
     entities = {npc, player}
+    # Initializes GameMap
+    game_map= GameMap(map_width, map_height)
     #Initialize new Engine
-    engine = Engine(entities=entities, event_handler=event_handler, player=player)
+    engine = Engine(entities=entities, event_handler=event_handler, game_map=game_map, player=player)
 
     # Screen is created here
     with tcod.context.new_terminal(

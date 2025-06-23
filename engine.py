@@ -5,17 +5,20 @@ from tcod.console import Console
 
 from actions import EscapeAction, MovementAction
 from entity import Entity
+from game_map import GameMap
 from input_handlers import EventHandler
 
 
 class Engine:
 
-    # Takes 3 arguments: entities is the Set of entities, 
+    # Takes 4 arguments: entities is the Set of entities, 
     # event_handler is the same one from main.py
     # player is the player entity separate from the set since it will be acessed way more often
-    def __init__(self, entities: Set[Entity], event_handler: EventHandler, player: Entity):
+    # game_map is the Game Map
+    def __init__(self, entities: Set[Entity], event_handler: EventHandler, game_map: GameMap, player: Entity):
         self.entities = entities
         self.event_handler = event_handler
+        self.game_map = game_map
         self.player = player
 
     # Iterates through events that are passed in
@@ -28,15 +31,19 @@ class Engine:
                     continue  
             # If action is instance of MovementAction, moves @ symbol
             if isinstance(action, MovementAction):
-                # Grabs dx and dy values from MovementAction and 
-                # adds it to player_x and player_y
-                self.player.move(dx=action.dx, dy=action.dy)
+                # Checks if we can walk on the tile or not
+                if self.game_map.tiles["walkable"][self.player.x + action.dx, self.player.y + action.dy]:
+                    # Grabs dx and dy values from MovementAction and 
+                    # adds it to player_x and player_y
+                    self.player.move(dx=action.dx, dy=action.dy)
                 # If user hits Esc, exit program
             elif isinstance(action, EscapeAction):
                 raise SystemExit()
             
     # Handles screen drawing
     def render(self, console: Console, context: Context) -> None:
+        # Calls game map's render method to draw the map
+        self.game_map.render(console)
         #Iterates through entities and prints their locations, etc.
         for entity in self.entities:
             console.print(entity.x, entity.y, entity.char, fg=entity.color)
