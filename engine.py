@@ -3,7 +3,6 @@ from typing import Set, Iterable, Any
 from tcod.context import Context
 from tcod.console import Console
 
-from actions import EscapeAction, MovementAction
 from entity import Entity
 from game_map import GameMap
 from input_handlers import EventHandler
@@ -29,16 +28,8 @@ class Engine:
             # Unrecognized key presses, skips rest of loop
             if action is None:
                     continue  
-            # If action is instance of MovementAction, moves @ symbol
-            if isinstance(action, MovementAction):
-                # Checks if we can walk on the tile or not
-                if self.game_map.tiles["walkable"][self.player.x + action.dx, self.player.y + action.dy]:
-                    # Grabs dx and dy values from MovementAction and 
-                    # adds it to player_x and player_y
-                    self.player.move(dx=action.dx, dy=action.dy)
-                # If user hits Esc, exit program
-            elif isinstance(action, EscapeAction):
-                raise SystemExit()
+            # Calls perfrom method from Action class
+            action.perform(self, self.player)
             
     # Handles screen drawing
     def render(self, console: Console, context: Context) -> None:
